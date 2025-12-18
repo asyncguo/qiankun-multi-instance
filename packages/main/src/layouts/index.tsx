@@ -1,8 +1,12 @@
-import { Link, Outlet, useOutlet, useRouteProps } from 'umi';
-import styles from './index.less';
-import { useRef } from 'react';
+import { Link, useOutlet, useRouteProps } from 'umi';
+import { useRef, useState } from 'react';
+import { Card, Tabs } from 'antd';
 
 export default function Layout() {
+  const [tabs] = useState([
+    { key: 'app1', label: <Link to="/app1">App1</Link> },
+    { key: 'app2', label: <Link to="/app2">App2</Link> },
+  ])
   const cache = useRef<{
     microApp: string
     element: React.ReactElement<any, string | React.JSXElementConstructor<any>> | null
@@ -12,6 +16,8 @@ export default function Layout() {
   const routeProps = useRouteProps()
   const { microApp } = routeProps
 
+  console.log('microApp',microApp)
+
   if (!cache.current.find(r => r.microApp === microApp)) {
     cache.current.push({
       microApp,
@@ -20,28 +26,23 @@ export default function Layout() {
   }
   
   return (
-    <div className={styles.navs}>
-      <ul>
-        <li>
-          <Link to="/app1">app1</Link>
-        </li>
-        <li>
-          <Link to="/app2">app2</Link>
-        </li>
-      </ul>
+    <Card title="Main App">
+      <Tabs
+        activeKey={microApp}
+        items={tabs}
+      />
 
-      {
-        cache.current.map((app) => {
-          return (
-            <div
-              key={app.microApp}
-              hidden={app.microApp !== microApp}
-              style={{ border: '1px solid' }}>
-              {app.element}
-            </div>
-          )
-        })
-      }
-    </div>
+        {
+          cache.current.map((app) => {
+            return (
+              <div
+                key={app.microApp}
+                hidden={app.microApp !== microApp}>
+                {app.element}
+              </div>
+            )
+          })
+        }
+    </Card>
   );
 }

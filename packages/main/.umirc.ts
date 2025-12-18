@@ -18,8 +18,10 @@ export default defineConfig({
     },
   ],
   plugins: [
+    "@umijs/plugins/dist/antd",
     '@umijs/plugins/dist/qiankun',
   ],
+  antd: {},
   qiankun: {
     master: {
       apps: [

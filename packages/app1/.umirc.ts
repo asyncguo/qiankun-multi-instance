@@ -4,10 +4,16 @@ export default defineConfig({
   mfsu: false,
   routes: [
     { path: "/", component: "index" },
-    { path: "/docs", component: "docs" },
   ],
   plugins: [
     '@umijs/plugins/dist/qiankun',
+  ],
+  headScripts:[
+    `
+      window.addEventListener("popstate", function(){
+        console.log("========= app1 popstate change =========");
+      })
+    `
   ],
   qiankun: {
     slave: {},
