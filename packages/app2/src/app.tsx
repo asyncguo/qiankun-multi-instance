@@ -1,38 +1,28 @@
-// export const modifyClientRenderOpts = (memo: any) => {
-//   const { history } = memo
+export const modifyClientRenderOpts = (context: any) => {
+  // @ts-ignore
+  if (window.__POWERED_BY_QIANKUN__) {
+    const { history, basename } = context;
 
-//   const originListen = history.listen
-//   let added = false
-//   const listeners = []
-//   let unlistener  = null
-  
-//   history.listen = function(fn) {
-//     listeners.push(fn)
-//     if (added === false) {
-//       added = true
-//       unlistener = originListen((...args) => {
-//         listeners.forEach(listener => {
-//           const {location: {pathname}} = args[0]
-//           if (pathname.startsWith('/sales')) {
-//             listener(...args)
-//           }
-//         })
-//       })
-//     }
+    const rawHistoryListen = history.listen;
 
-//     return function () {
-//       const index = listeners.findIndex(f => f === fn)
+    history.listen = (fn: any) => {
+      const listener = (...args: any[]) => {
+        const { location } = args[0];
 
-//       if (index > -1) {
-//         listeners.splice(index, 1)
+        // 只有路由匹配时才执行真正的订阅函数
+        if (location.pathname.startsWith(basename)) {
+          fn(...args);
+        }
+      };
+      const unlistener = rawHistoryListen(listener);
 
-//         if (listeners.length === 0) {
-//           unlistener()
-//           added = false
-//         }
-//       }
-//     }
-//   }
+      return () => {
+        unlistener();
+      };
+    };
 
-//   return memo;
-// };
+    return context;
+  }
+
+  return context;
+};
